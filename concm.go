@@ -1,12 +1,14 @@
 package concm
 
-import "sync"
+import (
+	"sync/atomic"
+)
 
 type Pool struct {
 	tasks   chan func()
 	limiter chan struct{}
-	wg      sync.WaitGroup
-	// counter atomic.Uint64
+	// wg      sync.WaitGroup
+	counter atomic.Uint64
 }
 
 func New() *Pool {
@@ -23,8 +25,8 @@ func (p *Pool) Start(n int) {
 			select {
 			case p.limiter <- struct{}{}:
 				go func(f func()) {
-					defer p.wg.Done()
-					// defer p.counter.Add(uint64(0) << 32)
+					// defer p.wg.Done()
+					defer p.counter.Add(^uint64(0))
 					f()
 					<-p.limiter
 				}(<-p.tasks)
@@ -35,11 +37,14 @@ func (p *Pool) Start(n int) {
 	}()
 }
 func (p *Pool) Go(f func()) {
-	p.wg.Add(1)
-	// p.counter.Add(uint64(1) << 32)
+	// p.wg.Add(1)
+	p.counter.Add(1)
 	p.tasks <- f
 }
 func (p *Pool) Wait() {
-	p.wg.Wait()
+	// p.wg.Wait()
+	for p.counter.CompareAndSwap(0, 0) {
+		return
+	}
 
 }
