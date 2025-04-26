@@ -43,8 +43,11 @@ func (p *Pool) Go(f func()) {
 }
 func (p *Pool) Wait() {
 	// p.wg.Wait()
-	for p.counter.CompareAndSwap(0, 0) {
-		return
+	for {
+		if p.counter.CompareAndSwap(0, 0) {
+			return
+		}
+
 	}
 
 }
