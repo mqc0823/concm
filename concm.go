@@ -18,7 +18,7 @@ func (p *Pool) WithMaxGoroutines(n int) *Pool {
 	p.limiter = make(chan struct{}, n)
 	return p
 }
-func (p *Pool) Start(n int) {
+func (p *Pool) Start(n int) *Pool {
 	p.tasks = make(chan func(), n)
 	go func() {
 		for {
@@ -35,6 +35,7 @@ func (p *Pool) Start(n int) {
 			}
 		}
 	}()
+	return p
 }
 func (p *Pool) Go(f func()) {
 	// p.wg.Add(1)
