@@ -2,6 +2,7 @@ package concm
 
 import (
 	"sync/atomic"
+	"time"
 )
 
 type Pool struct {
@@ -48,7 +49,7 @@ func (p *Pool) Wait() {
 		if p.counter.CompareAndSwap(0, 0) {
 			return
 		}
-
+		time.Sleep(1 * time.Second)
 	}
 
 }
