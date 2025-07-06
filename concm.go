@@ -49,6 +49,7 @@ func (p *Pool) Go(f func()) {
 }
 func (p *Pool) Wait() {
 	p.wg.Wait()
+	p.over = make(chan struct{}, 1)
 	p.over <- struct{}{}
 	// for {
 	// 	if p.counter.CompareAndSwap(0, 0) {
